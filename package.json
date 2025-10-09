@@ -1,0 +1,25 @@
+{
+  "name": "zhennova-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js", 
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ecommerce",
+    "hardware",
+    "pc",
+    "perifericos",
+    "api",
+    "nodejs"
+  ],
+  "author": "Sosa Gustavo",
+  "license": "MIT",
+  "description": "API para e-commerce de hardware y periféricos para PC",
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
+
