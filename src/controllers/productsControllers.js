@@ -1,6 +1,6 @@
 const {products} = require("../db/database");
 
-const createProductController = (name, email) => {
+const createProductController = (name, price, category) => {
   const id = products.length + 1;
 
   const newProduct = { id, name, price, category };

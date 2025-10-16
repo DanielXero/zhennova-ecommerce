@@ -23,41 +23,19 @@ const getAllUsersHandler = (req, res) => {
 // Handler para obtener un usuario por ID
 const getOneUserHandler = (req, res) => {
   const { id } = req.params;
-  const userId = Number(id);
 
-  const usuarios = {
-    1: { id: 1, name: "Juan Pérez", email: "juan@zhennova.com" },
-    2: { id: 2, name: "María López", email: "maria@zhennova.com" },
-  };
+  const response = getOneUserById(id);
 
-  const user = usuarios[userId];
-
-  if (!user) {
-    return res.status(404).json({
-      message: `Usuario con ID ${id} no encontrado`,
-    });
-  } else {
-    res.status(200).json({
-      message: `Usuario con ID ${id}`,
-      user,
-    });
-  }
+  res.status(200).send(response);
 };
 
 // Handler para crear un nuevo usuario
 const createUserHandler = (req, res) => {
   const { name, email } = req.body;
 
-  if (!name || !email) {
-    return res.status(400).json({
-      message: "Faltan datos obligatorios: name y email",
-    });
-  } else {
-    res.status(201).json({
-      message: "Usuario creado exitosamente",
-      user: { id: Date.now(), name, email },
-    });
-  }
+  const response = createUserController(name, email);
+
+  res.status(201).send(response);
 };
 
 // Handler para actualizar un usuario
@@ -65,19 +43,16 @@ const updateUserHandler = (req, res) => {
   const { id } = req.params;
   const { name, email } = req.body;
 
-  res.status(200).json({
-    message: `Usuario con ID ${id} actualizado`,
-    user: { id: Number(id), name, email },
-  });
+  const response = updateUserController(id, name, email);
+  res.status(200).send(response);
 };
 
 // Handler para eliminar un usuario
 const deleteUserHandler = (req, res) => {
   const { id } = req.params;
 
-  res.status(200).json({
-    message: `Usuario con ID ${id} eliminado`,
-  });
+  const response = deleteUserController(id);
+  res.status(200).send(response);
 };
 
 module.exports = {
