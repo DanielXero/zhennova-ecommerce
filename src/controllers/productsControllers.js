@@ -1,14 +1,42 @@
-const {products} = require("../db/database");
+const { products } = require("../db/database");
 
-const createProductController = (name, price, category) => {
+const Joi = require("joi");
+
+// Esquema de validación con Joi
+const productSchema = Joi.object({
+  name: Joi.string().min(3).required().messages({
+    "string.min": "El nombre debe tener al menos 3 caracteres",
+    "string.empty": "El nombre no puede estar vacío",
+    "any.required": "El nombre es obligatorio",
+  }),
+  price: Joi.number().positive().required().messages({
+    "number.base": "El precio debe ser un número",
+    "number.positive": "El precio debe ser mayor que 0",
+    "any.required": "El precio es obligatorio",
+  }),
+  category: Joi.string()
+    .valid("Periféricos", "Componentes")
+    .required()
+    .messages({
+      "any.only": 'La categoría debe ser "Periféricos" o "Componentes"',
+      "string.empty": "La categoría no puede estar vacía",
+      "any.required": "La categoría es obligatoria",
+    }),
+});
+
+const createProductController = (productData) => {
+  // Validación con Joi
+  const { error } = userSchema.validate(productData);
+  if (error) {
+    throw new Error(error.details[0].message);
+  }
+  const { name, price, category } = productData;
   const id = products.length + 1;
 
   const newProduct = { id, name, price, category };
-  if (!name || !price || !category) throw new Error("Los datos estan incompletos");
   products.push(newProduct);
   return newProduct;
 };
-
 
 const getAllProductsController = () => {
   return products;
@@ -27,12 +55,19 @@ const getOneProductById = (id) => {
   return productById;
 };
 
-const updateProductController = (id, name, price, category) => {
+const updateProductController = (id, productData) => {
   const productById = products.find((product) => product.id === Number(id));
 
   if (!productById) {
     throw new Error(`No se encontró un producto con ID ${id}`);
   }
+
+  const { error } = userSchema.validate(productData);
+  if (error) {
+    throw new Error(error.details[0].message);
+  }
+
+  const { name, price, category } = productData;
 
   const newProduct = { name, price, category };
 

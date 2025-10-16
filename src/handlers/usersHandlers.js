@@ -38,9 +38,7 @@ const getOneUserHandler = (req, res) => {
 // Handler para crear un nuevo usuario
 const createUserHandler = (req, res) => {
   try {
-    const { name, email } = req.body;
-
-    const response = createUserController(name, email);
+    const response = createUserController(req.body);
 
     res.status(201).send(response);
   } catch (error) {
@@ -52,9 +50,8 @@ const createUserHandler = (req, res) => {
 const updateUserHandler = (req, res) => {
   try {
     const { id } = req.params;
-    const { name, email } = req.body;
 
-    const response = updateUserController(id, name, email);
+    const response = updateUserController(id, req.body);
     res.status(200).send(response);
   } catch (error) {
     res.status(400).send({ Error: error.message });

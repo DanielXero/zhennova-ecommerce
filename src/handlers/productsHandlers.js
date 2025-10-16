@@ -40,9 +40,7 @@ const getOneProductHandler = (req, res) => {
 // Handler para crear un nuevo producto
 const createProductHandler = (req, res) => {
   try {
-    const { name, price, category } = req.body;
-
-    const response = createProductController(name, price, category);
+    const response = createProductController(req.body);
 
     res.status(201).send(response);
   } catch (error) {
@@ -54,9 +52,8 @@ const createProductHandler = (req, res) => {
 const updateProductHandler = (req, res) => {
   try {
     const { id } = req.params;
-    const { name, price, category } = req.body;
 
-    const response = updateProductController(id, name, price, category);
+    const response = updateProductController(id, req.body);
     res.status(200).send(response);
   } catch (error) {}
 };
