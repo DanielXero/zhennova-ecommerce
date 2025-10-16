@@ -9,50 +9,68 @@ const {
 
 // Handler para obtener todos los productos
 const getAllProductsHandler = (req, res) => {
-  const { name } = req.query;
+  try {
+    const { name } = req.query;
 
-  if (name) {
-    const response = getProductsByNameController(name);
-    res.status(200).send(response);
-  } else {
-    const response = getAllProductsController();
-    res.status(200).send(response);
+    if (name) {
+      const response = getProductsByNameController(name);
+      res.status(200).send(response);
+    } else {
+      const response = getAllProductsController();
+      res.status(200).send(response);
+    }
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
   }
 };
 
 // Handler para obtener un producto por ID
 const getOneProductHandler = (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const response = getOneProductById(id);
+    const response = getOneProductById(id);
 
-  res.status(200).send(response);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
+  }
 };
 
 // Handler para crear un nuevo producto
 const createProductHandler = (req, res) => {
-  const { name, price, category } = req.body;
+  try {
+    const { name, price, category } = req.body;
 
-   const response = createProductController(name, price, category);
+    const response = createProductController(name, price, category);
 
-  res.status(201).send(response);
+    res.status(201).send(response);
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
+  }
 };
 
 // Handler para actualizar un producto
 const updateProductHandler = (req, res) => {
-  const { id } = req.params;
-  const { name, price, category } = req.body;
+  try {
+    const { id } = req.params;
+    const { name, price, category } = req.body;
 
-  const response = updateProductController(id, name, price, category);
-  res.status(200).send(response);
+    const response = updateProductController(id, name, price, category);
+    res.status(200).send(response);
+  } catch (error) {}
 };
 
 // Handler para eliminar un producto
 const deleteProductHandler = (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const response = deleteProductController(id);
-  res.status(200).send(response);
+    const response = deleteProductController(id);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
+  }
 };
 
 module.exports = {

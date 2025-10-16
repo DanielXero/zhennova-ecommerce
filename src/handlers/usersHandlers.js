@@ -9,50 +9,68 @@ const {
 
 // Handler para obtener todos los usuarios
 const getAllUsersHandler = (req, res) => {
-  const { name } = req.query;
+  try {
+    const { name } = req.query;
 
-  if (name) {
-    const response = getUsersByNameController(name);
-    res.status(200).send(response);
-  } else {
-    const response = getAllUsersController();
-    res.status(200).send(response);
+    if (name) {
+      const response = getUsersByNameController(name);
+      res.status(200).send(response);
+    } else {
+      const response = getAllUsersController();
+      res.status(200).send(response);
+    }
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
   }
 };
 
 // Handler para obtener un usuario por ID
 const getOneUserHandler = (req, res) => {
-  const { id } = req.params;
-
-  const response = getOneUserById(id);
-
-  res.status(200).send(response);
+  try {
+    const { id } = req.params;
+    const response = getOneUserById(id);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
+  }
 };
 
 // Handler para crear un nuevo usuario
 const createUserHandler = (req, res) => {
-  const { name, email } = req.body;
+  try {
+    const { name, email } = req.body;
 
-  const response = createUserController(name, email);
+    const response = createUserController(name, email);
 
-  res.status(201).send(response);
+    res.status(201).send(response);
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
+  }
 };
 
 // Handler para actualizar un usuario
 const updateUserHandler = (req, res) => {
-  const { id } = req.params;
-  const { name, email } = req.body;
+  try {
+    const { id } = req.params;
+    const { name, email } = req.body;
 
-  const response = updateUserController(id, name, email);
-  res.status(200).send(response);
+    const response = updateUserController(id, name, email);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
+  }
 };
 
 // Handler para eliminar un usuario
 const deleteUserHandler = (req, res) => {
-  const { id } = req.params;
+  try {
+    const { id } = req.params;
 
-  const response = deleteUserController(id);
-  res.status(200).send(response);
+    const response = deleteUserController(id);
+    res.status(200).send(response);
+  } catch (error) {
+    res.status(400).send({ Error: error.message });
+  }
 };
 
 module.exports = {
