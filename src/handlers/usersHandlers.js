@@ -1,24 +1,22 @@
+const {
+  createUserController,
+  getAllUsersController,
+  getUsersByNameController,
+  getOneUserById,
+  updateUserController,
+  deleteUserController,
+} = require("../controllers/usersControllers");
+
 // Handler para obtener todos los usuarios
 const getAllUsersHandler = (req, res) => {
-  const { name } = req.query; // Filtro opcional por nombre
+  const { name } = req.query;
 
   if (name) {
-    return res.status(200).json({
-      message: `Usuario(s) con nombre que contiene "${name}"`,
-      users: [
-        { id: 1, name: "Juan Pérez", email: "juan@zhennova.com" },
-        { id: 2, name: "María López", email: "maria@zhennova.com" },
-      ].filter((u) => u.name.toLowerCase().includes(name.toLowerCase())),
-    });
+    const response = getUsersByNameController(name);
+    res.status(200).send(response);
   } else {
-    res.status(200).json({
-      message: "Lista de usuarios de Zhennova",
-      users: [
-        { id: 1, name: "Juan Pérez", email: "juan@zhennova.com" },
-        { id: 2, name: "María López", email: "maria@zhennova.com" },
-        { id: 3, name: "Carlos Gómez", email: "carlos@zhennova.com" },
-      ],
-    });
+    const response = getAllUsersController();
+    res.status(200).send(response);
   }
 };
 

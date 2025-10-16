@@ -1,60 +1,27 @@
+const {
+  createProductController,
+  getAllProductsController,
+  getProductsByNameController,
+  getOneProductById,
+  updateProductController,
+  deleteProductController,
+} = require("../controllers/productsControllers");
+
 // Handler para obtener todos los productos
 const getAllProductsHandler = (req, res) => {
-  const { name } = req.query; // Filtro opcional por nombre
+  const { name } = req.query;
 
   if (name) {
-    return res.status(200).json({
-      message: `Producto con nombre que contiene "${name}"`,
-      products: [
-        {
-          id: 1,
-          name: "Teclado Mecánico RGB",
-          price: 85000,
-          category: "Periféricos",
-        },
-        {
-          id: 2,
-          name: "Mouse Gaming 16000 DPI",
-          price: 26200,
-          category: "Periféricos",
-        },
-      ].filter((p) => p.name.toLowerCase().includes(name.toLowerCase())),
-    });
+    const response = getProductsByNameController(name);
+    res.status(200).send(response);
   } else {
-    res.status(200).json({
-      message: "Lista de productos de Zhennova",
-      products: [
-        {
-          id: 1,
-          name: "Teclado Mecánico RGB",
-          price: 85000,
-          category: "Periféricos",
-        },
-        {
-          id: 2,
-          name: "Memoria RAM 16GB DDR4",
-          price: 34000,
-          category: "Componentes",
-        },
-        {
-          id: 3,
-          name: "Fuente de Poder 650W 80+ Bronze",
-          price: 80000,
-          category: "Componentes",
-        },
-        {
-          id: 4,
-          name: 'Monitor 24" 144Hz',
-          price: 150000,
-          category: "Periféricos",
-        },
-      ],
-    });
+    const response = getAllProductsController();
+    res.status(200).send(response);
   }
 };
 
 // Handler para obtener un producto por ID
-const  getOneProductHandler = (req, res) => {
+const getOneProductHandler = (req, res) => {
   const { id } = req.params;
   const productId = Number(id);
 
@@ -87,13 +54,11 @@ const  getOneProductHandler = (req, res) => {
       message: `Producto con ID ${id} no encontrado`,
     });
   } else {
-      res.status(200).json({
-    message: `Producto con ID ${id}`,
-    product,
-  });
+    res.status(200).json({
+      message: `Producto con ID ${id}`,
+      product,
+    });
   }
-
-
 };
 
 // Handler para crear un nuevo producto
@@ -105,13 +70,11 @@ const createProductHandler = (req, res) => {
       message: "Faltan datos obligatorios: name, price y category",
     });
   } else {
-  res.status(201).json({
-    message: "Producto creado exitosamente",
-    product: { id: Date.now(), name, price, category },
-  });
+    res.status(201).json({
+      message: "Producto creado exitosamente",
+      product: { id: Date.now(), name, price, category },
+    });
   }
-
-
 };
 
 // Handler para actualizar un producto
