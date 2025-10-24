@@ -27,7 +27,7 @@ const createUserController = async (userData) => {
 
   const { name, email, password, role } = userData;
   
-  // Validar que el email no exista
+  // Verificar si el email ya existe
   const emailExists = users.some(user => user.email === email);
   if (emailExists) {
     throw new Error('El email ya está registrado');
