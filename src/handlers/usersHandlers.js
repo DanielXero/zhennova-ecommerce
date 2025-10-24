@@ -36,9 +36,9 @@ const getOneUserHandler = (req, res) => {
 };
 
 // Handler para crear un nuevo usuario
-const createUserHandler = (req, res) => {
+const createUserHandler = async (req, res) => {
   try {
-    const response = createUserController(req.body);
+    const response = await createUserController(req.body);
 
     res.status(201).send(response);
   } catch (error) {
@@ -47,11 +47,11 @@ const createUserHandler = (req, res) => {
 };
 
 // Handler para actualizar un usuario
-const updateUserHandler = (req, res) => {
+const updateUserHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const response = updateUserController(id, req.body);
+    const response = await updateUserController(id, req.body);
     res.status(200).send(response);
   } catch (error) {
     res.status(400).send({ Error: error.message });

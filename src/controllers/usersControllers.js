@@ -1,25 +1,42 @@
 const { users } = require("../db/database");
 
 const Joi = require("joi");
+const bcrypt = require("bcrypt");
 
 // Esquema de validación con Joi
 const userSchema = Joi.object({
   name: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
+  password: Joi.string()
+    .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{6,}$/)
+    .required()
+    .messages({
+      "string.pattern.base":
+        "La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un número.",
+    }),
+    role: Joi.string().valid('user', 'admin').required(),
 });
 
 // Controlador para crear un nuevo usuario
-const createUserController = (userData) => {
+const createUserController = async (userData) => {
   // Validación con Joi
   const { error } = userSchema.validate(userData);
   if (error) {
     throw new Error(error.details[0].message);
   }
 
-  const { name, email } = userData;
+  const { name, email, password, role } = userData;
+  
+  // Validar que el email no exista
+  const emailExists = users.some(user => user.email === email);
+  if (emailExists) {
+    throw new Error('El email ya está registrado');
+  }
+
+  const hashPassword = await bcrypt.hash(password, 10);
   const id = users.length + 1;
 
-  const newUser = { id, name, email };
+  const newUser = { id, name, email, name, password: hashPassword, role };
   users.push(newUser);
   return newUser;
 };
@@ -44,7 +61,7 @@ const getOneUserById = (id) => {
 };
 
 // Controlador para actualizar un usuario por ID
-const updateUserController = (id, userData) => {
+const updateUserController = async (id, userData) => {
   const userById = users.find((user) => user.id === Number(id));
 
   if (!userById) {
@@ -56,9 +73,20 @@ const updateUserController = (id, userData) => {
     throw new Error(error.details[0].message);
   }
 
-  const { name, email } = userData;
+  const { name, email, password, role } = userData;
 
-  const newUser = { name, email };
+    // Buscar si ya existe otro usuario con ese email (excluyendo al actual)
+  const emailExists = users.some(user => 
+    user.email === email && user.id !== Number(id)
+  );
+
+  if (emailExists) {
+    throw new Error('El email ya está en uso por otro usuario');
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  const newUser = { name, email, password, role };
 
   if (userById) {
     Object.assign(userById, newUser);
