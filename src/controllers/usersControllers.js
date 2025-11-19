@@ -14,7 +14,7 @@ const userSchema = Joi.object({
       "string.pattern.base":
         "La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un número.",
     }),
-    role: Joi.string().valid('user', 'admin').required(),
+    id_rol: Joi.number().integer().valid(1, 2).required()
 });
 
 // Controlador para crear un nuevo usuario
@@ -25,7 +25,7 @@ const createUserController = async (userData) => {
     throw new Error(error.details[0].message);
   }
 
-  const { name, email, password, role } = userData;
+  const { name, email, password, id_rol } = userData;
   
   // Verificar si el email ya existe
   const emailExists = users.some(user => user.email === email);
@@ -36,7 +36,7 @@ const createUserController = async (userData) => {
   const hashPassword = await bcrypt.hash(password, 10);
   const id = users.length + 1;
 
-  const newUser = { id, name, email, name, password: hashPassword, role };
+  const newUser = { id, name, email, password: hashPassword, id_rol };
   users.push(newUser);
   return newUser;
 };
