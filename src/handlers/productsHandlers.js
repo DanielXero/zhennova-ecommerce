@@ -8,7 +8,7 @@ const {
 } = require("../controllers/productsControllers");
 
 // Handler para obtener todos los productos
-const getAllProductsHandler = (req, res) => {
+const getAllProductsHandler = (req, res, next) => {
   try {
     const { name } = req.query;
 
@@ -20,12 +20,12 @@ const getAllProductsHandler = (req, res) => {
       res.status(200).send(response);
     }
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 
 // Handler para obtener un producto por ID
-const getOneProductHandler = (req, res) => {
+const getOneProductHandler = (req, res, next) => {
   try {
     const { id } = req.params;
 
@@ -33,40 +33,42 @@ const getOneProductHandler = (req, res) => {
 
     res.status(200).send(response);
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 
 // Handler para crear un nuevo producto
-const createProductHandler = (req, res) => {
+const createProductHandler = (req, res, next) => {
   try {
     const response = createProductController(req.body);
 
     res.status(201).send(response);
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 
 // Handler para actualizar un producto
-const updateProductHandler = (req, res) => {
+const updateProductHandler = (req, res, next) => {
   try {
     const { id } = req.params;
 
     const response = updateProductController(id, req.body);
     res.status(200).send(response);
-  } catch (error) {}
+  } catch (error) {
+     next(error);
+  }
 };
 
 // Handler para eliminar un producto
-const deleteProductHandler = (req, res) => {
+const deleteProductHandler = (req, res, next) => {
   try {
     const { id } = req.params;
 
     const response = deleteProductController(id);
     res.status(200).send(response);
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 

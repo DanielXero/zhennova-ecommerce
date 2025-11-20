@@ -8,7 +8,7 @@ const {
 } = require("../controllers/usersControllers");
 
 // Handler para obtener todos los usuarios
-const getAllUsersHandler = (req, res) => {
+const getAllUsersHandler = (req, res, next) => {
   try {
     const { name } = req.query;
 
@@ -20,53 +20,53 @@ const getAllUsersHandler = (req, res) => {
       res.status(200).send(response);
     }
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 
 // Handler para obtener un usuario por ID
-const getOneUserHandler = (req, res) => {
+const getOneUserHandler = (req, res, next) => {
   try {
     const { id } = req.params;
     const response = getOneUserById(id);
     res.status(200).send(response);
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+    next(error);
   }
 };
 
 // Handler para crear un nuevo usuario
-const createUserHandler = async (req, res) => {
+const createUserHandler = async (req, res, next) => {
   try {
     const response = await createUserController(req.body);
 
     res.status(201).send(response);
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 
 // Handler para actualizar un usuario
-const updateUserHandler = async (req, res) => {
+const updateUserHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
 
     const response = await updateUserController(id, req.body);
     res.status(200).send(response);
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 
 // Handler para eliminar un usuario
-const deleteUserHandler = (req, res) => {
+const deleteUserHandler = (req, res, next) => {
   try {
     const { id } = req.params;
 
     const response = deleteUserController(id);
     res.status(200).send(response);
   } catch (error) {
-    res.status(400).send({ Error: error.message });
+     next(error);
   }
 };
 
