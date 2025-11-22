@@ -1,4 +1,4 @@
-const User = require("../models/User");
+const { User } = require("../db/associations");
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");

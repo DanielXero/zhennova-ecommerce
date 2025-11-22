@@ -1,4 +1,4 @@
-const Product = require("../models/Product");
+const { Product } = require("../db/associations");
 
 const Joi = require("joi");
 
