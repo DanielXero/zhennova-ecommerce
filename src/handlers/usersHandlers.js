@@ -5,6 +5,7 @@ const {
   getOneUserById,
   updateUserController,
   deleteUserController,
+  restoreUserController
 } = require("../controllers/usersControllers");
 
 // Handler para obtener todos los usuarios
@@ -16,7 +17,7 @@ const getAllUsersHandler = async (req, res, next) => {
       const response = await getUsersByNameController(name);
       res.status(200).send(response);
     } else {
-      const response = getAllUsersController();
+      const response = await getAllUsersController();
       res.status(200).send(response);
     }
   } catch (error) {
@@ -70,7 +71,7 @@ const deleteUserHandler = async (req, res, next) => {
   }
 };
 
-const restoreUserHandler = async (req, res) => {
+const restoreUserHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
     const response = await restoreUserController(id);

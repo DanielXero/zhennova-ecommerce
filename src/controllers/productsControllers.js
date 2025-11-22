@@ -34,7 +34,7 @@ const createProductController = async (productData) => {
 
   const { name, description, price, stock, category_id } = productData;
 
-  // Verificar si ya existe un producto con ese nombre (opcional, según tu lógica)
+  // Verificar si ya existe un producto con ese nombre
   const existingProduct = await Product.findOne({
     where: { name },
     paranoid: false,
@@ -94,7 +94,7 @@ const getOneProductById = async (id) => {
 // Actualizar un producto por ID
 const updateProductController = async (id, productData) => {
   // Validación
-  const { error } = productUpdateSchema.validate(productData, { stripUnknown: true });
+  const { error } = productSchema.validate(productData, { stripUnknown: true });
   if (error) {
     throw new Error(error.details[0].message);
   }

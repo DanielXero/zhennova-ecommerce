@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
+const { Op } = require("sequelize");
 
 // Esquema de validación con Joi
 const userSchema = Joi.object({
@@ -25,7 +26,7 @@ const createUserController = async (userData) => {
     throw new Error(error.details[0].message);
   }
 
-  const { name, email, password, role } = userData;
+  const { name, username, email, password, role } = userData;
 
   // Verificar si el email ya existe
   const emailExists = await User.findOne({ where: { email } });
@@ -88,7 +89,7 @@ const getOneUserById = async (id) => {
 // Controlador para actualizar un usuario por ID
 const updateUserController = async (id, userData) => {
   // Validación
-  const { error } = userUpdateSchema.validate(userData, { stripUnknown: true });
+  const { error } = userSchema.validate(userData, { stripUnknown: true });
   if (error) {
     throw new Error(error.details[0].message);
   }
@@ -107,7 +108,10 @@ const updateUserController = async (id, userData) => {
   // Si se actualiza el email, verificar que no esté en uso (por otro usuario)
   if (userData.email) {
     const emailExists = await User.findOne({
-      where: { email: userData.email, id: { [User.sequelize.Op.ne]: id } },
+      where: { 
+        email: userData.email, 
+        id: { [Op.ne]: id }
+      },
       paranoid: false,
     });
     if (emailExists) {
@@ -120,7 +124,7 @@ const updateUserController = async (id, userData) => {
     const usernameExists = await User.findOne({
       where: {
         username: userData.username,
-        id: { [User.sequelize.Op.ne]: id },
+        id: { [Op.ne]: id } 
       },
       paranoid: false,
     });
@@ -132,7 +136,7 @@ const updateUserController = async (id, userData) => {
   // Hashear nueva contraseña si se envía
   if (userData.password) {
     userData.password_hash = await bcrypt.hash(userData.password, 10);
-    delete userData.password; // Ya no necesitamos el plaintext
+    delete userData.password; 
   }
 
   // Mapear rol a role_id
@@ -142,7 +146,9 @@ const updateUserController = async (id, userData) => {
   }
 
   // Actualizar campos
-  await user.update(userData);
+  await user.update(userData, {
+    where: {id}
+  });
 
   // Devolver sin password_hash ni deletedAt
   const { password_hash, deletedAt, ...userWithoutSensitiveData } =

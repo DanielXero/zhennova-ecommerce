@@ -16,11 +16,11 @@ const router = Router();
 router.get('/', verifyToken, autorizationAdmin, getAllUsersHandler);
 router.get('/:id', getOneUserHandler);
 router.post('/', createUserHandler);
-router.put('/:id', updateUserHandler);
-router.delete('/:id', deleteUserHandler);
+router.put('/:id', verifyToken, autorizationAdmin, updateUserHandler);
+router.delete('/:id', verifyToken, autorizationAdmin, deleteUserHandler);
 
 // Restaurar usuario
-router.put('/restore/:id', restoreUserHandler);
+router.put('/restore/:id', verifyToken, autorizationAdmin, restoreUserHandler);
 
 
 

@@ -17,7 +17,7 @@ const getAllProductsHandler = async (req, res, next) => {
       const response = await getProductsByNameController(name);
       res.status(200).send(response);
     } else {
-      const response = getAllProductsController();
+      const response = await getAllProductsController();
       res.status(200).send(response);
     }
   } catch (error) {
