@@ -1,7 +1,7 @@
 import { Header } from './components/Header';
-import { ProductList } from './components/ProductList';
+import { Home } from './components/Home';
 import { Footer } from './components/Footer';
-import './App.css'; // Puedes mantener los estilos o borrarlos si prefieres
+import './App.css'; 
 
 function App() {
   return (
@@ -11,7 +11,7 @@ function App() {
       
       {/* Renderizamos la lista de productos (Main content) */}
       <main>
-        <ProductList />
+        <Home />
       </main>
 
       {/* Renderizamos el Footer */}
