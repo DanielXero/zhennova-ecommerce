@@ -4,7 +4,8 @@ const {
   getOneProductHandler,
   createProductHandler,
   updateProductHandler,
-  deleteProductHandler
+  deleteProductHandler,
+  restoreProductHandler
 } = require('../handlers/productsHandlers');
 
 const router = Router();
@@ -14,5 +15,8 @@ router.get('/:id', getOneProductHandler);
 router.post('/', createProductHandler);
 router.put('/:id', updateProductHandler);
 router.delete('/:id', deleteProductHandler);
+
+// Restaurar producto
+router.put('/restore/:id', restoreProductHandler);
 
 module.exports = router;

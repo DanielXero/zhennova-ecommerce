@@ -1,11 +1,11 @@
-const { users } = require("../db/database");
-
+const User = require("../models/User");
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
 
 // Esquema de validación con Joi
 const userSchema = Joi.object({
   name: Joi.string().min(3).required(),
+  username: Joi.string().min(3).required(),
   email: Joi.string().email().required(),
   password: Joi.string()
     .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d@$!%*?&]{6,}$/)
@@ -14,7 +14,7 @@ const userSchema = Joi.object({
       "string.pattern.base":
         "La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un número.",
     }),
-    id_rol: Joi.number().integer().valid(1, 2).required()
+  role: Joi.string().valid("user", "admin").optional().default("user"),
 });
 
 // Controlador para crear un nuevo usuario
@@ -25,87 +25,152 @@ const createUserController = async (userData) => {
     throw new Error(error.details[0].message);
   }
 
-  const { name, email, password, id_rol } = userData;
-  
+  const { name, email, password, role } = userData;
+
   // Verificar si el email ya existe
-  const emailExists = users.some(user => user.email === email);
+  const emailExists = await User.findOne({ where: { email } });
   if (emailExists) {
-    throw new Error('El email ya está registrado');
+    throw new Error("El email ya está registrado");
+  }
+
+  // Verificar si el username ya existe
+  const usernameExists = await User.findOne({ where: { username } });
+  if (usernameExists) {
+    throw new Error("El nombre de usuario ya está en uso");
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
-  const id = users.length + 1;
 
-  const newUser = { id, name, email, password: hashPassword, id_rol };
-  users.push(newUser);
-  return newUser;
+  // Crear el usuario
+  const newUser = await User.create({
+    name,
+    username,
+    email,
+    password_hash: hashPassword,
+    role_id: role === "admin" ? 2 : 1,
+  });
+
+  const { password_hash, ...userWithoutPassword } = newUser.toJSON();
+  return { message: "Nuevo usuario creado", newUser: userWithoutPassword };
 };
 
 // Controlador para obtener todos los usuarios
-const getAllUsersController = () => {
+const getAllUsersController = async () => {
+  const users = await User.findAll({
+    attributes: { exclude: ["password_hash"] },
+  });
   return users;
 };
 
 // Controlador para obtener usuarios por nombre
-const getUsersByNameController = (name) => {
-  const userByName = users.filter((user) => user.name === name);
-  if (!userByName.length)
-    throw new Error("No se encontro el usuario con ese nombre");
+const getUsersByNameController = async (name) => {
+  const userByName = await User.findAll({
+    where: { name },
+    attributes: { exclude: ["password_hash"] },
+  });
+  if (userByName.length === 0) {
+    throw new Error("No se encontró el usuario con ese nombre");
+  }
   return userByName;
 };
 // Controlador para obtener un usuario por ID
-const getOneUserById = (id) => {
-  const userById = users.find((user) => user.id === Number(id));
-  if (!userById) throw new Error("No se encontro el usuario con ese ID");
+const getOneUserById = async (id) => {
+  const userById = await User.findByPk(id, {
+    attributes: { exclude: ["password_hash"] },
+  });
+  if (!userById) {
+    throw new Error("No se encontró el usuario con ese ID");
+  }
   return userById;
 };
+// userById
 
 // Controlador para actualizar un usuario por ID
 const updateUserController = async (id, userData) => {
-  const userById = users.find((user) => user.id === Number(id));
-
-  if (!userById) {
-    throw new Error(`No se encontró un usuario con ID ${id}`);
-  }
-
-  const { error } = userSchema.validate(userData);
+  // Validación
+  const { error } = userUpdateSchema.validate(userData, { stripUnknown: true });
   if (error) {
     throw new Error(error.details[0].message);
   }
 
-  const { name, email, password, role } = userData;
-
-    // Buscar si ya existe otro usuario con ese email (excluyendo al actual)
-  const emailExists = users.some(user => 
-    user.email === email && user.id !== Number(id)
-  );
-
-  if (emailExists) {
-    throw new Error('El email ya está en uso por otro usuario');
+  // Buscar usuario (incluye eliminados lógicamente)
+  const user = await User.findByPk(id, { paranoid: false });
+  if (!user) {
+    throw new Error("Usuario no encontrado");
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const newUser = { name, email, password, role };
-
-  if (userById) {
-    Object.assign(userById, newUser);
+  // Si el usuario estaba eliminado, restaurarlo implícitamente
+  if (user.deletedAt !== null) {
+    await user.restore();
   }
-  return userById;
+
+  // Si se actualiza el email, verificar que no esté en uso (por otro usuario)
+  if (userData.email) {
+    const emailExists = await User.findOne({
+      where: { email: userData.email, id: { [User.sequelize.Op.ne]: id } },
+      paranoid: false,
+    });
+    if (emailExists) {
+      throw new Error("El email ya está en uso por otro usuario");
+    }
+  }
+
+  // Si se actualiza el username, verificar unicidad
+  if (userData.username) {
+    const usernameExists = await User.findOne({
+      where: {
+        username: userData.username,
+        id: { [User.sequelize.Op.ne]: id },
+      },
+      paranoid: false,
+    });
+    if (usernameExists) {
+      throw new Error("El nombre de usuario ya está en uso");
+    }
+  }
+
+  // Hashear nueva contraseña si se envía
+  if (userData.password) {
+    userData.password_hash = await bcrypt.hash(userData.password, 10);
+    delete userData.password; // Ya no necesitamos el plaintext
+  }
+
+  // Mapear rol a role_id
+  if (userData.role) {
+    userData.role_id = userData.role === "admin" ? 2 : 1;
+    delete userData.role;
+  }
+
+  // Actualizar campos
+  await user.update(userData);
+
+  // Devolver sin password_hash ni deletedAt
+  const { password_hash, deletedAt, ...userWithoutSensitiveData } =
+    user.toJSON();
+  return userWithoutSensitiveData;
 };
 
 // Controlador para eliminar un usuario por ID
-const deleteUserController = (id) => {
-  const index = users.findIndex((user) => user.id === parseInt(id));
-
-  if (index === -1) {
-    throw new Error(`No se encontró un usuario con ID ${id}`);
+const deleteUserController = async (id) => {
+  const userDelete = await User.findByPk(id);
+  if (!userDelete) {
+    throw new Error("Usuario no encontrado");
   }
+  await userDelete.destroy();
+  return userDelete;
+};
 
-  const deleteUserArray = users.splice(index, 1);
-
-  const deleteUser = deleteUserArray[0];
-  return deleteUser;
+// Controlador para restaurar usuario eliminado
+const restoreUserController = async (id) => {
+  const user = await User.findByPk(id, { paranoid: false }); // 👈 Incluye eliminados
+  if (!user) {
+    throw new Error("Usuario no encontrado");
+  }
+  if (!user.deletedAt) {
+    throw new Error("El usuario no estaba eliminado");
+  }
+  await user.restore(); // Esto hace UPDATE SET deleted_at = NULL
+  return user;
 };
 
 module.exports = {
@@ -115,4 +180,5 @@ module.exports = {
   getOneUserById,
   updateUserController,
   deleteUserController,
+  restoreUserController,
 };

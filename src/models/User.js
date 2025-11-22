@@ -42,7 +42,7 @@ const User = sequelize.define('User', {
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   underscored: true,
-  paranoid: false  
+  paranoid: true  
 });
 
 module.exports = User;

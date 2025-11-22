@@ -1,4 +1,4 @@
-const { products } = require("../db/database");
+const Product = require("../models/Product");
 
 const Joi = require("joi");
 
@@ -6,89 +6,148 @@ const Joi = require("joi");
 const productSchema = Joi.object({
   name: Joi.string().min(3).required().messages({
     "string.min": "El nombre debe tener al menos 3 caracteres",
-    "string.empty": "El nombre no puede estar vacío",
     "any.required": "El nombre es obligatorio",
   }),
-  price: Joi.number().positive().required().messages({
+  description: Joi.string().optional().allow("", null),
+  price: Joi.number().positive().precision(2).required().messages({
     "number.base": "El precio debe ser un número",
     "number.positive": "El precio debe ser mayor que 0",
+    "number.precision": "El precio debe tener máximo 2 decimales",
     "any.required": "El precio es obligatorio",
   }),
-  category: Joi.string()
-    .valid("Periféricos", "Componentes")
-    .required()
-    .messages({
-      "any.only": 'La categoría debe ser "Periféricos" o "Componentes"',
-      "string.empty": "La categoría no puede estar vacía",
-      "any.required": "La categoría es obligatoria",
-    }),
+  stock: Joi.number().integer().min(0).optional().default(0).messages({
+    "number.base": "El stock debe ser un número entero",
+    "number.min": "El stock no puede ser negativo",
+  }),
+  category_id: Joi.number().integer().required().messages({
+    "number.base": "El ID de categoría debe ser un número entero",
+    "any.required": "La categoría es obligatoria",
+  }),
 });
 
-const createProductController = (productData) => {
-  // Validación con Joi
-  const { error } = userSchema.validate(productData);
+// Crear un nuevo producto
+const createProductController = async (productData) => {
+  const { error } = productSchema.validate(productData, { stripUnknown: true });
   if (error) {
     throw new Error(error.details[0].message);
   }
-  const { name, price, category } = productData;
-  const id = products.length + 1;
 
-  const newProduct = { id, name, price, category };
-  products.push(newProduct);
-  return newProduct;
+  const { name, description, price, stock, category_id } = productData;
+
+  // Verificar si ya existe un producto con ese nombre (opcional, según tu lógica)
+  const existingProduct = await Product.findOne({
+    where: { name },
+    paranoid: false,
+  });
+  if (existingProduct) {
+    throw new Error("Ya existe un producto con ese nombre");
+  }
+
+  const newProduct = await Product.create({
+    name,
+    description,
+    price,
+    stock,
+    category_id,
+  });
+
+  const { deletedAt, ...productWithoutDeletedAt } = newProduct.toJSON();
+  return productWithoutDeletedAt;
 };
 
-const getAllProductsController = () => {
+// Obtener todos los productos (activos)
+const getAllProductsController = async () => {
+  const products = await Product.findAll({
+    attributes: { exclude: ["deletedAt"] },
+  });
   return products;
 };
 
-const getProductsByNameController = (name) => {
-  const productByName = products.filter((product) => product.name === name);
-  if (!productByName.length)
-    throw new Error("No se encontro el producto con ese nombre");
-  return productByName;
+// Obtener productos por nombre (búsqueda parcial)
+const getProductsByNameController = async (name) => {
+  const products = await Product.findAll({
+    where: {
+      name: {
+        [Product.sequelize.Op.iLike]: `%${name}%`,
+      },
+    },
+    attributes: { exclude: ["deletedAt"] },
+  });
+  if (products.length === 0) {
+    throw new Error("No se encontraron productos con ese nombre");
+  }
+  return products;
 };
 
-const getOneProductById = (id) => {
-  const productById = products.find((product) => product.id === Number(id));
-  if (!productById) throw new Error("No se encontro el producto con ese ID");
+// productById
+
+const getOneProductById = async (id) => {
+  const productById = await Product.findByPk(id, {
+    attributes: { exclude: ["deletedAt"] },
+  });
+  if (!productById) {
+    throw new Error("Producto no encontrado");
+  }
   return productById;
 };
 
-const updateProductController = (id, productData) => {
-  const productById = products.find((product) => product.id === Number(id));
-
-  if (!productById) {
-    throw new Error(`No se encontró un producto con ID ${id}`);
-  }
-
-  const { error } = userSchema.validate(productData);
+// Actualizar un producto por ID
+const updateProductController = async (id, productData) => {
+  // Validación
+  const { error } = productUpdateSchema.validate(productData, { stripUnknown: true });
   if (error) {
     throw new Error(error.details[0].message);
   }
 
-  const { name, price, category } = productData;
-
-  const newProduct = { name, price, category };
-
-  if (productById) {
-    Object.assign(productById, newProduct);
-  }
-  return productById;
-};
-
-const deleteProductController = (id) => {
-  const index = products.findIndex((product) => product.id === parseInt(id));
-
-  if (index === -1) {
-    throw new Error(`No se encontró un producto con ID ${id}`);
+  // Buscar producto (incluye eliminados)
+  const product = await Product.findByPk(id, { paranoid: false });
+  if (!product) {
+    throw new Error("Producto no encontrado");
   }
 
-  const deleteProductArray = products.splice(index, 1);
+  // Si estaba eliminado, restaurarlo
+  if (product.deletedAt !== null) {
+    await product.restore();
+  }
 
-  const deleteProduct = deleteProductArray[0];
-  return deleteProduct;
+  // Actualizar
+  await product.update(productData);
+
+  // Devolver sin deletedAt
+  const { deletedAt, ...productWithoutDeleted } = product.toJSON();
+  return productWithoutDeleted;
 };
+
+
+// Eliminar (baja lógica) un producto por ID
+const deleteProductController =async (id) => {
+  const product = await Product.findByPk(id);
+  if (!product) {
+    throw new Error("Producto no encontrado");
+  }
+
+  await product.destroy(); // Esto solo pone deleted_at = NOW()
+
+  const { deletedAt, ...deletedProduct } = product.toJSON();
+  return deletedProduct;
+};
+
+// Restaurar un producto eliminado
+const restoreProductController = async (id) => {
+  const product = await Product.findByPk(id, { paranoid: false });
+  if (!product) {
+    throw new Error("Producto no encontrado");
+  }
+
+  if (!product.deletedAt) {
+    throw new Error("El producto no está eliminado");
+  }
+
+  await product.restore(); // Esto pone deleted_at = NULL
+
+  const { deletedAt, ...restoredProduct } = product.toJSON();
+  return restoredProduct;
+};  
 
 module.exports = {
   createProductController,
@@ -97,4 +156,5 @@ module.exports = {
   getOneProductById,
   updateProductController,
   deleteProductController,
+  restoreProductController
 };

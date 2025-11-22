@@ -4,7 +4,8 @@ const {
   getOneUserHandler,
   createUserHandler,
   updateUserHandler,
-  deleteUserHandler
+  deleteUserHandler,
+  restoreUserHandler
 } = require('../handlers/usersHandlers');
 
 const verifyToken = require("../middleware/verifyToken");
@@ -17,6 +18,9 @@ router.get('/:id', getOneUserHandler);
 router.post('/', createUserHandler);
 router.put('/:id', updateUserHandler);
 router.delete('/:id', deleteUserHandler);
+
+// Restaurar usuario
+router.put('/restore/:id', restoreUserHandler);
 
 
 

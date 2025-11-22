@@ -5,15 +5,16 @@ const {
   getOneProductById,
   updateProductController,
   deleteProductController,
+  restoreProductController
 } = require("../controllers/productsControllers");
 
 // Handler para obtener todos los productos
-const getAllProductsHandler = (req, res, next) => {
+const getAllProductsHandler = async (req, res, next) => {
   try {
     const { name } = req.query;
 
     if (name) {
-      const response = getProductsByNameController(name);
+      const response = await getProductsByNameController(name);
       res.status(200).send(response);
     } else {
       const response = getAllProductsController();
@@ -25,11 +26,11 @@ const getAllProductsHandler = (req, res, next) => {
 };
 
 // Handler para obtener un producto por ID
-const getOneProductHandler = (req, res, next) => {
+const getOneProductHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const response = getOneProductById(id);
+    const response = await getOneProductById(id);
 
     res.status(200).send(response);
   } catch (error) {
@@ -38,9 +39,9 @@ const getOneProductHandler = (req, res, next) => {
 };
 
 // Handler para crear un nuevo producto
-const createProductHandler = (req, res, next) => {
+const createProductHandler = async (req, res, next) => {
   try {
-    const response = createProductController(req.body);
+    const response = await createProductController(req.body);
 
     res.status(201).send(response);
   } catch (error) {
@@ -49,11 +50,11 @@ const createProductHandler = (req, res, next) => {
 };
 
 // Handler para actualizar un producto
-const updateProductHandler = (req, res, next) => {
+const updateProductHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const response = updateProductController(id, req.body);
+    const response = await updateProductController(id, req.body);
     res.status(200).send(response);
   } catch (error) {
      next(error);
@@ -61,14 +62,24 @@ const updateProductHandler = (req, res, next) => {
 };
 
 // Handler para eliminar un producto
-const deleteProductHandler = (req, res, next) => {
+const deleteProductHandler = async (req, res, next) => {
   try {
     const { id } = req.params;
 
-    const response = deleteProductController(id);
+    const response = await deleteProductController(id);
     res.status(200).send(response);
   } catch (error) {
      next(error);
+  }
+};
+
+const restoreProductHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const response = await restoreProductController(id);
+    res.status(200).send(response);
+  } catch (error) {
+    next(error);
   }
 };
 
@@ -78,4 +89,5 @@ module.exports = {
   createProductHandler,
   updateProductHandler,
   deleteProductHandler,
+  restoreProductHandler
 };

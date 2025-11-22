@@ -2,6 +2,9 @@ const app = require("./src/app");
 require("dotenv").config({ quiet: true });
 const sequelize = require("./src/db/database");
 
+
+
+
 const PORT = process.env.PORT || 3001;
 
 async function main() {
