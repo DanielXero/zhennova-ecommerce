@@ -1,12 +1,21 @@
-const app = require('./src/app')
-require('dotenv').config({quiet: true})
+const app = require("./src/app");
+require("dotenv").config({ quiet: true });
+const sequelize = require("./src/db/database");
 
+const PORT = process.env.PORT || 3001;
 
+async function main() {
+  try {
+    await sequelize.authenticate();
+    console.log("Conexión a la base de datos establecida correctamente.");
 
-const PORT = process.env.PORT || 3001
+    app.listen(PORT, () => {
+      console.log(`Servidor Zhennova escuchando en http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error al conectar con la base de datos:", error);
+    process.exit(1);
+  }
+}
 
-
-
-app.listen(PORT, () => {
-    console.log(`Servidor Zhennova escuchando en http://localhost:${PORT}`)
-})
+main();

@@ -10,7 +10,7 @@ const verifyToken = (req, res, next) => {
   const token = authHeader.split(' ')[1];
   try {
     const decode = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decode; // Adjunta los datos del usuario a la solicitud
+    req.user = decode; 
     next();
   } catch (error) {
     return res.status(401).send("Token invalido");
