@@ -3,11 +3,35 @@ import React from 'react';
 
 export const Home = () => {
   return (
-    <div className="home-container .text-cyan" >
-      <h1>Bienvenido a ZhenNova</h1>
-      <p>Tu tienda experta en Hardware y Periféricos.</p>
-      <p>Descubre las mejores ofertas en tecnología.</p>
-      
-    </div>
+    <div className="home-container">
+      {/* Hero Section */}
+      <section className="bg-dark text-white py-5">
+        <div className="container">
+          <div className="row align-items-center min-vh-50 py-5">
+            <div className="col-lg-6">
+              <span className="badge bg-primary mb-3 fs-6">Tecnología de Vanguardia</span>
+              <h1 className="display-4 fw-bold mb-4">
+                Bienvenido a <span className="text-cyan">ZhenNova</span>
+              </h1>
+              <p className="lead mb-4 fs-5">
+                Tu tienda experta en Hardware y Periféricos. Descubre las mejores ofertas en tecnología 
+                con la garantía y calidad que mereces.
+              </p>
+              <div className="d-flex gap-3 flex-wrap">
+                <button className="btn btn-zhennova btn-lg px-4 py-2">
+                  Ver Productos
+                </button>
+              </div>
+            </div>
+            <div className="col-lg-6 text-center">
+              <div className="hero-image-placeholder bg-gradient-primary rounded-3 p-5">
+                <i className="bi bi-cpu text-cyan opacity-75" style={{ fontSize: '120px' }}></i>
+                <p className="mt-3 text-muted">Imagen destacada de productos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div>
   );
 };

@@ -1,9 +1,13 @@
 import React from 'react';
+import { NavBar } from './NavBar';
+
 
 export const Header = () => {
   return (
     <header>
-      <h1>Ecommerce ZhenNova</h1>
+      
+      <NavBar />
+
     </header>
   );
 };
