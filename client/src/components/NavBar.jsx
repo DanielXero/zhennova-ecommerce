@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavLink } from 'react-router-dom';
 
 
 export const NavBar = () => {
@@ -27,18 +28,18 @@ export const NavBar = () => {
           {/* Navegación Principal */}
           <ul className="navbar-nav mx-auto">
             <li className="nav-item">
-              <a className="nav-link fw-semibold mx-2" href="/">Inicio</a>
+              <NavLink className="nav-link fw-semibold mx-2" to="/">Inicio</NavLink>
             </li>
             
             <li className="nav-item">
-              <a className="nav-link fw-semibold mx-2" href="/nosotros">Productos</a>
+              <NavLink className="nav-link fw-semibold mx-2" to="/">Productos</NavLink>
             </li>
 
             <li className="nav-item">
-              <a className="nav-link fw-semibold mx-2" href="/nosotros">Nosotros</a>
+              <NavLink className="nav-link fw-semibold mx-2" to="/">Nosotros</NavLink>
             </li>
             <li className="nav-item">
-              <a className="nav-link fw-semibold mx-2" href="/contacto">Contacto</a>
+              <NavLink className="nav-link fw-semibold mx-2" to="/">Contacto</NavLink>
             </li>
           </ul>
           
