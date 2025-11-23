@@ -11,7 +11,7 @@ export const ProductItem = ({ product }) => {
       />
       <h4>{product.title}</h4>
       <p style={{ fontWeight: 'bold' }}>${product.price}</p>
-      {/* Aquí podrías agregar un botón "Ver detalles" en el futuro */}
+      
       <button>Agregar al carrito</button>
     </section>
   );
