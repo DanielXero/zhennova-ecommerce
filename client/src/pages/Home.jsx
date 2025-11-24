@@ -1,4 +1,5 @@
 import React from 'react';
+import heroImage from '../assets/hero.jpg';
 
 
 export const Home = () => {
@@ -23,10 +24,11 @@ export const Home = () => {
                 </button>
               </div>
             </div>
-            <div className="col-lg-6 text-center">
-              <div className="hero-image-placeholder bg-gradient-primary rounded-3 p-5">
-                <i className="bi bi-cpu text-cyan opacity-75" style={{ fontSize: '120px' }}></i>
-                <p className="mt-3 text-muted">Imagen destacada de productos</p>
+            <div className="col-lg-6 text-center img-fluid ">
+              <div className=" bg-gradient-primary rounded-3 p-5 ">
+                {/* <i className="bi bi-cpu text-cyan opacity-75" style={{ fontSize: '120px' }}></i> */}
+                <img src={heroImage} className="img-fluid" alt="Hero image" />
+                
               </div>
             </div>
           </div>

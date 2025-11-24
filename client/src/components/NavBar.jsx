@@ -1,9 +1,15 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
-
+import { NavLink, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '../store/usersSlice';
 
 export const NavBar = () => {
+const { user, isAuth } = useSelector((state) => state.users);
+  const dispatch = useDispatch();
 
+  const handleLogout = () => {
+    dispatch(logout());
+  };
   
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-primary">
@@ -12,8 +18,7 @@ export const NavBar = () => {
         <a className="navbar-brand d-flex align-items-center" href="/">
           <span className="text-cyan fw-bold fs-3">ZhenNova</span>
 
-        </a>
-        
+        </a>       
         
         <button 
           className="navbar-toggler" 
@@ -43,9 +48,7 @@ export const NavBar = () => {
             </li>
           </ul>
           
-          {/* Barra de Búsqueda y Acciones */}
           <div className="d-flex align-items-center">
-            {/* Barra de Búsqueda */}
             <form className="d-flex me-3 d-none d-lg-flex">
               <div className="input-group">
                 <input
@@ -60,24 +63,47 @@ export const NavBar = () => {
               </div>
             </form>
             
-            {/* Acciones de Usuario */}
-            <div className="d-flex align-items-center gap-2">
-              {/* Icono de Usuario */}
-              <button className="btn btn-outline-light position-relative" title="Mi Cuenta">
-                <i className="bi bi-person"></i>
-              </button>
-              
-              {/* Icono de Carrito */}
-              <button className="btn btn-outline-warning position-relative" title="Carrito de Compras">
-                <i className="bi bi-cart"></i>
-                <span className="position-absolute top-0 start-100 translate-middle badge bg-danger">
-                  0
-                </span>
-              </button>
-            </div>
+             {isAuth ? (
+              // SI ESTÁ LOGUEADO: Muestra Dropdown con Nombre y Salir
+              <div className="dropdown">
+                <button 
+                  className="btn btn-outline-light dropdown-toggle d-flex align-items-center gap-2" 
+                  type="button" 
+                  data-bs-toggle="dropdown" 
+                  aria-expanded="false"
+                >
+                  <i className="bi bi-person-circle"></i>
+                  {/* Mostramos el nombre o username */}
+                  <span>{user?.username || user?.name || "Usuario"}</span>
+                </button>
+                <ul className="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                  <li><span className="dropdown-item-text small">{user?.email}</span></li>
+                  <li><hr className="dropdown-divider" /></li>
+                  <li>
+                    <button className="dropdown-item text-danger" onClick={handleLogout}>
+                      Cerrar Sesión
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            ) : (
+              // SI NO ESTÁ LOGUEADO: Muestra botón de Ingresar
+              <Link to="/login" className="btn btn-primary fw-bold">
+                Ingresar
+              </Link>
+            )}
+
+            {/* Botón Carrito (Estático por ahora como pediste) */}
+            <button className="btn btn-outline-warning position-relative ms-3" title="Carrito de Compras">
+              <i className="bi bi-cart-fill"></i>
+              <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                0
+              </span>
+            </button>
+
           </div>
         </div>
       </div>
     </nav>
   );
-}
+};
