@@ -1,4 +1,4 @@
-# ⚡ Zhennova E-commerce
+# Zhennova E-commerce
 
 ![Status](https://img.shields.io/badge/Status-En_Desarrollo-yellow)
 ![License](https://img.shields.io/badge/License-MIT-blue)
@@ -10,7 +10,7 @@ Este proyecto simula un entorno de producción real, priorizando la **integridad
 
 ---
 
-## 🚀 Tecnologías (Stack PERN)
+## Tecnologías (Stack PERN)
 
 El proyecto fue desarrollado utilizando el stack **PERN** para garantizar integridad referencial y transacciones ACID.
 
@@ -48,7 +48,7 @@ El Backend sigue el principio de **Separación de Responsabilidades**:
 
 ---
 
-## ✨ Funcionalidades Principales
+## Funcionalidades Principales
 
 ### 🔐 Autenticación y Usuarios
 *   Registro seguro con validación de complejidad de contraseña.
@@ -68,7 +68,7 @@ El Backend sigue el principio de **Separación de Responsabilidades**:
 
 ---
 
-## 🛠️ Instalación y Configuración
+## Instalación y Configuración
 
 Sigue estos pasos para correr el proyecto localmente:
 
