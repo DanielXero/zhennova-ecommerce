@@ -37,14 +37,16 @@ const { user, isAuth } = useSelector((state) => state.users);
             </li>
             
             <li className="nav-item">
-              <NavLink className="nav-link fw-semibold mx-2" to="/">Productos</NavLink>
+              <NavLink className="nav-link fw-semibold mx-2" to="/productos">Productos</NavLink> {/* 👈 RUTA CORREGIDA */}
             </li>
 
             <li className="nav-item">
-              <NavLink className="nav-link fw-semibold mx-2" to="/">Nosotros</NavLink>
+              {/* RUTA CORREGIDA: "/nosotros" */}
+              <NavLink className="nav-link fw-semibold mx-2" to="/nosotros">Nosotros</NavLink> 
             </li>
             <li className="nav-item">
-              <NavLink className="nav-link fw-semibold mx-2" to="/">Contacto</NavLink>
+              {/* RUTA CORREGIDA: "/contacto" */}
+              <NavLink className="nav-link fw-semibold mx-2" to="/contacto">Contacto</NavLink>
             </li>
           </ul>
           
